@@ -59,15 +59,9 @@ EXPOSE 8001
 HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
     CMD curl -f http://localhost:8001/health || exit 1
 
-# Production: Gunicorn with UvicornWorker
-# Adjust --workers based on vCPU count: (2 × vCPU) + 1
-CMD ["gunicorn", "app.main:app", \
-     "--worker-class", "uvicorn.workers.UvicornWorker", \
-     "--workers", "3", \
-     "--bind", "0.0.0.0:8001", \
-     "--timeout", "120", \
-     "--graceful-timeout", "30", \
-     "--keep-alive", "5", \
-     "--access-logfile", "-", \
-     "--error-logfile", "-", \
+# Use uvicorn directly (gunicorn is optional for Railway)
+CMD ["uvicorn", "app.main:app", \
+     "--host", "0.0.0.0", \
+     "--port", "8001", \
+     "--workers", "2", \
      "--log-level", "info"]
